@@ -1,6 +1,6 @@
 # Lab 2 — Order Management API
 
-API quản lý đơn hàng theo tài liệu **Lab 2: Backend với Node.js & Express**. Dự án dùng Express, MongoDB Atlas, Mongoose và Postman; chạy backend trên máy của em.
+API quản lý đơn hàng theo tài liệu **Lab 2: Backend với Node.js & Express**. Dự án dùng Express, MongoDB Atlas, Mongoose và Postman.
 
 ## Cấu trúc
 
