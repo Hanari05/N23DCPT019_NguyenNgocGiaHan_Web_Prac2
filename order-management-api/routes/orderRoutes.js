@@ -5,17 +5,47 @@ const Order = require('../models/Order');
 const router = express.Router();
 
 // GET /api/orders - Lay danh sach don hang, moi nhat truoc.
-// Bai tap tu lam: loc theo req.query.status va sap xep theo req.query.sort.
+// Challenge 1: loc trang thai. Challenge 2: sap xep tong tien.
 router.get('/', async (req, res) => {
   try {
-    const orders = await Order.find().sort({ createdAt: -1 });
+    const { status, sort } = req.query;
+    const allowedStatuses = Order.schema.path('status').enumValues;
+    if (status !== undefined && (typeof status !== 'string' || !allowedStatuses.includes(status))) {
+      return res.status(400).json({ message: 'status khong hop le' });
+    }
+    if (sort !== undefined && !['asc', 'desc'].includes(sort)) {
+      return res.status(400).json({ message: 'sort phai la asc hoac desc' });
+    }
+    // Co the ket hop ?status=pending&sort=asc.
+    const filter = status === undefined ? {} : { status };
+    const sortOptions = sort === undefined
+      ? { createdAt: -1, _id: -1 }
+      : { totalAmount: sort === 'asc' ? 1 : -1, _id: 1 };
+    const orders = await Order.find(filter).sort(sortOptions);
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
-// Bai tap tu lam: them GET /search?name=... tai day, TRUOC /:id.
+// Challenge 3: tim mot phan ten, khong phan biet hoa thuong.
+// Dat /search TRUOC /:id de Express khong xem 'search' la ID.
+router.get('/search', async (req, res) => {
+  const { name } = req.query;
+  if (typeof name !== 'string' || !name.trim()) {
+    return res.status(400).json({ message: 'Hay truyen name khong rong' });
+  }
+  // Escape ky tu regex de ten nhu 'An (A)' duoc tim nhu van ban thuong.
+  const escapedName = name.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  try {
+    const orders = await Order.find({
+      customerName: { $regex: escapedName, $options: 'i' },
+    }).sort({ createdAt: -1, _id: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 // GET /api/orders/:id - Lay mot don hang.
 router.get('/:id', async (req, res) => {

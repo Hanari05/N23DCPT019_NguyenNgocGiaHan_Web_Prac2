@@ -21,43 +21,220 @@
       ],
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"customerName\": \"Nguyen Ngoc Gia Han\",\n  \"customerEmail\": \"giahan@email.com\",\n  \"items\": [\n    { \"productName\": \"Laptop Dell XPS\", \"quantity\": 1, \"unitPrice\": 25000000 },\n    { \"productName\": \"Chuot Logitech\", \"quantity\": 2, \"unitPrice\": 500000 }\n  ],\n  \"totalAmount\": 26000000\n}",
-          "options": { "raw": { "language": "json" } }
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         },
         "url": "{{baseUrl}}/api/orders"
       }
     },
     {
       "name": "2. Lay danh sach (GET)",
-      "request": { "method": "GET", "url": "{{baseUrl}}/api/orders" }
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/orders"
+      }
     },
     {
       "name": "3. Lay theo ID (GET)",
-      "request": { "method": "GET", "url": "{{baseUrl}}/api/orders/{{orderId}}" }
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/orders/{{orderId}}"
+      }
     },
     {
       "name": "4. Cap nhat trang thai (PUT)",
       "request": {
         "method": "PUT",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
         "body": {
           "mode": "raw",
           "raw": "{\n  \"status\": \"confirmed\"\n}",
-          "options": { "raw": { "language": "json" } }
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
         },
         "url": "{{baseUrl}}/api/orders/{{orderId}}"
       }
     },
     {
       "name": "5. Xoa don hang (DELETE)",
-      "request": { "method": "DELETE", "url": "{{baseUrl}}/api/orders/{{orderId}}" }
+      "request": {
+        "method": "DELETE",
+        "url": "{{baseUrl}}/api/orders/{{orderId}}"
+      }
+    },
+    {
+      "name": "6. Loc pending",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/orders?status=pending"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Tong tien tang dan",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/orders?sort=asc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Tong tien giam dan",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/orders?sort=desc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Ket hop loc va sap xep",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/orders?status=pending&sort=asc"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. Tim ten khong phan biet hoa thuong",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/orders/search?name=nguyen"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "11. Tu choi status sai",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/orders?status=wrong"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "12. Tu choi sort sai",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/orders?sort=wrong"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "13. Tu choi thieu ten",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/orders/search"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+            ]
+          }
+        }
+      ]
     }
   ],
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:5000" },
-    { "key": "orderId", "value": "" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "orderId",
+      "value": ""
+    }
   ]
 }
