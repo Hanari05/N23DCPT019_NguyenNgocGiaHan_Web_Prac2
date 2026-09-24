@@ -1,8 +1,12 @@
 # 🛒 Lab 2 — RESTful API Quản lý Đơn hàng
 
+<<<<<<< HEAD
 **Sinh viên:** Nguyễn Ngọc Gia Hân  
 **MSSV:** N23DCPT019  
 **Nội dung:** Backend với Node.js, Express và MongoDB Atlas
+=======
+API quản lý đơn hàng theo tài liệu **Lab 2: Backend với Node.js & Express**. Dự án dùng Express, MongoDB Atlas, Mongoose và Postman.
+>>>>>>> be7618256608bbf1cb74e1e8511ffaca3729d51a
 
 API quản lý đơn hàng phục vụ thực hành CRUD, kết nối cơ sở dữ liệu qua Mongoose và kiểm thử bằng Postman. Dự án có chức năng lọc trạng thái, tìm kiếm tên khách hàng và sắp xếp tổng tiền theo mục Challenge của Lab 2.
 
