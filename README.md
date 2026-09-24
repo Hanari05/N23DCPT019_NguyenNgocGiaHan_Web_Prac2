@@ -328,3 +328,30 @@ git push
 ```
 
 Không đưa mật khẩu vào README, collection hoặc ảnh minh chứng. Khi chuẩn bị nộp, có thể bổ sung ảnh Postman và Atlas để thể hiện kết quả thực tế, nếu giảng viên yêu cầu.
+
+## 11. Kiểm thử tự động CRUD và ba Challenge
+
+Chạy trong thư mục `order-management-api` với Node.js >= 18:
+
+```bash
+npm run test:api
+```
+
+Mặc định script gọi `http://localhost:5000`; cần khởi động server ở terminal khác trước.
+Để kiểm tra bản Render bằng PowerShell:
+
+```powershell
+$env:API_BASE_URL = "https://nguyenngocgiahan-lab2-ltw.onrender.com"
+npm run test:api
+Remove-Item Env:API_BASE_URL
+```
+
+Script thực sự tạo ba đơn hàng tạm với tiền 100, 200, 300 và tên có tiền tố `LAB2-TEST-` riêng cho mỗi lần chạy. Script kiểm tra tạo, đọc, cập nhật, lọc, sắp xếp, tìm kiếm, dữ liệu đầu vào sai và xóa. Khối `finally` xóa các đơn do lần chạy tạo ra, không sửa hoặc xóa đơn có sẵn. Nếu mất mạng hoặc bị dừng đột ngột, kiểm tra các ID/tên tạm được ghi trong terminal để dọn thủ công.
+
+Lần kiểm tra ngày 24/09/2026 trên URL Render: **19 kiểm tra đạt**, các đơn tạm đều đã được xóa và kiểm tra lại bằng GET trả 404. Đây là kết quả tại thời điểm kiểm tra, không phải cam kết dịch vụ luôn hoạt động.
+
+Collection Postman đã có kiểm tra HTTP status và nội dung phản hồi. Import lại file JSON khi cập nhật repo; chạy request 1–5 theo thứ tự để `orderId` được lấy từ đơn vừa tạo. Các kiểm tra lọc/sắp xếp trên mảng rỗng có thể vẫn đạt; dùng script trên để kiểm tra với dữ liệu khác nhau.
+
+### Lưu ý file cấu hình bí mật
+
+Quy tắc bỏ qua ở gốc repo bảo vệ `.env`, `.env.*` và `*.env`, giữ lại `.env.example`. Quy tắc này không xóa file đã commit hoặc xóa bí mật trong lịch sử Git. Nếu credentials từng được commit, cần đổi mật khẩu database user trên Atlas, cập nhật `MONGO_URI` ở máy cá nhân và Render, sau đó xử lý lịch sử Git có phối hợp với những người đang dùng repo.

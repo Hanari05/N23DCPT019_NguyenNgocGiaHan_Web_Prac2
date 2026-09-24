@@ -13,8 +13,10 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('201 Created', () => pm.response.to.have.status(201));",
-              "if (pm.response.code === 201) pm.collectionVariables.set('orderId', pm.response.json()._id);"
+              "pm.test('HTTP 201', () => pm.response.to.have.status(201));",
+              "const data = pm.response.json();",
+              "pm.test('Created order', () => { pm.expect(data._id).to.be.a('string'); pm.expect(data.status).to.eql('pending'); });",
+              "if (pm.response.code === 201) pm.collectionVariables.set('orderId', data._id);"
             ]
           }
         }
@@ -44,14 +46,40 @@
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/api/orders"
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test('Response is an array', () => pm.expect(data).to.be.an('array'));"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "3. Lay theo ID (GET)",
       "request": {
         "method": "GET",
         "url": "{{baseUrl}}/api/orders/{{orderId}}"
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test('Correct ID', () => pm.expect(data._id).to.eql(pm.collectionVariables.get('orderId')));"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "4. Cap nhat trang thai (PUT)",
@@ -73,14 +101,41 @@
           }
         },
         "url": "{{baseUrl}}/api/orders/{{orderId}}"
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test('Correct ID', () => pm.expect(data._id).to.eql(pm.collectionVariables.get('orderId')));",
+              "pm.test('Updated status', () => pm.expect(data.status).to.eql('confirmed'));"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "5. Xoa don hang (DELETE)",
       "request": {
         "method": "DELETE",
         "url": "{{baseUrl}}/api/orders/{{orderId}}"
-      }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test('Message returned', () => pm.expect(data.message).to.be.a('string'));"
+            ]
+          }
+        }
+      ]
     },
     {
       "name": "6. Loc pending",
@@ -94,7 +149,10 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test('Response is an array', () => pm.expect(data).to.be.an('array'));",
+              "pm.test('All orders pending', () => data.forEach(x => pm.expect(x.status).to.eql('pending')));"
             ]
           }
         }
@@ -112,7 +170,10 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test('Response is an array', () => pm.expect(data).to.be.an('array'));",
+              "pm.test('Correct amount order', () => data.forEach((x, i) => { if (i) pm.expect(data[i-1].totalAmount).to.be.at.most(x.totalAmount); }));"
             ]
           }
         }
@@ -130,7 +191,10 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test('Response is an array', () => pm.expect(data).to.be.an('array'));",
+              "pm.test('Correct amount order', () => data.forEach((x, i) => { if (i) pm.expect(data[i-1].totalAmount).to.be.at.least(x.totalAmount); }));"
             ]
           }
         }
@@ -148,7 +212,11 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test('Response is an array', () => pm.expect(data).to.be.an('array'));",
+              "pm.test('All orders pending', () => data.forEach(x => pm.expect(x.status).to.eql('pending')));",
+              "pm.test('Correct amount order', () => data.forEach((x, i) => { if (i) pm.expect(data[i-1].totalAmount).to.be.at.most(x.totalAmount); }));"
             ]
           }
         }
@@ -166,7 +234,10 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 200', () => pm.response.to.have.status(200));"
+              "pm.test('HTTP 200', () => pm.response.to.have.status(200));",
+              "const data = pm.response.json();",
+              "pm.test('Response is an array', () => pm.expect(data).to.be.an('array'));",
+              "pm.test('Name matches', () => data.forEach(x => pm.expect(x.customerName.toLowerCase()).to.include('nguyen')));"
             ]
           }
         }
@@ -184,7 +255,9 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+              "pm.test('HTTP 400', () => pm.response.to.have.status(400));",
+              "const data = pm.response.json();",
+              "pm.test('Message returned', () => pm.expect(data.message).to.be.a('string'));"
             ]
           }
         }
@@ -202,7 +275,9 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+              "pm.test('HTTP 400', () => pm.response.to.have.status(400));",
+              "const data = pm.response.json();",
+              "pm.test('Message returned', () => pm.expect(data.message).to.be.a('string'));"
             ]
           }
         }
@@ -220,7 +295,9 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('HTTP 400', () => pm.response.to.have.status(400));"
+              "pm.test('HTTP 400', () => pm.response.to.have.status(400));",
+              "const data = pm.response.json();",
+              "pm.test('Message returned', () => pm.expect(data.message).to.be.a('string'));"
             ]
           }
         }
