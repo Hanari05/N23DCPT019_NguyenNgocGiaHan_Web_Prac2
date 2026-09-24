@@ -6,6 +6,14 @@
 
 API quản lý đơn hàng phục vụ thực hành CRUD, kết nối cơ sở dữ liệu qua Mongoose và kiểm thử bằng Postman. Dự án có chức năng lọc trạng thái, tìm kiếm tên khách hàng và sắp xếp tổng tiền theo mục Challenge của Lab 2.
 
+## 🌐 API online
+
+- **Render:** [https://nguyenngocgiahan-lab2-ltw.onrender.com](https://nguyenngocgiahan-lab2-ltw.onrender.com)
+- **Danh sách đơn hàng:** [https://nguyenngocgiahan-lab2-ltw.onrender.com/api/orders](https://nguyenngocgiahan-lab2-ltw.onrender.com/api/orders)
+- **Database:** MongoDB Atlas — `OrderDB`, collection `orders`.
+
+Đây là backend API: trang gốc hiển thị thông báo hoạt động, các endpoint trả JSON. Có thể gọi API online mà không chạy server local.
+
 ## 1. Công nghệ
 
 | Công nghệ | Vai trò |
@@ -18,22 +26,22 @@ API quản lý đơn hàng phục vụ thực hành CRUD, kết nối cơ sở d
 | cors | Cho phép truy cập API từ nguồn khác |
 | nodemon | Tự khởi động lại server khi sửa code trong chế độ dev |
 | Postman | Gửi request và kiểm tra response |
+| Render | Triển khai backend tại URL HTTPS |
 
 ## 2. Cấu trúc dự án
 
 ```text
-order-management-api/
-├── models/
-│   └── Order.js
-├── routes/
-│   └── orderRoutes.js
-├── postman/
-│   └── Order-Management.postman_collection.json
-├── .env.example
-├── .gitignore
-├── package.json
+repo/
 ├── README.md
-└── server.js
+└── order-management-api/
+    ├── models/Order.js
+    ├── routes/orderRoutes.js
+    ├── postman/Order-Management.postman_collection.json
+    ├── .env.example
+    ├── .gitignore
+    ├── package.json
+    ├── package-lock.json
+    └── server.js
 ```
 
 Sau khi chạy `npm install`, npm tạo `node_modules/` và có thể tạo hoặc cập nhật `package-lock.json`. Nên commit `package-lock.json` để cố định phiên bản thư viện; không commit `node_modules/`.
@@ -120,7 +128,12 @@ Mongoose tạo `_id` cho document và ánh xạ model `Order` đến collection 
 
 ## 5. API CRUD
 
-Base URL: `http://localhost:5000`
+| Môi trường | Base URL |
+| --- | --- |
+| Online | `https://nguyenngocgiahan-lab2-ltw.onrender.com` |
+| Local | `http://localhost:5000` |
+
+Trong Postman dùng `{{baseUrl}}` để chuyển giữa hai môi trường.
 
 | Method | Endpoint | Chức năng | Thành công |
 | --- | --- | --- | --- |
@@ -153,7 +166,7 @@ Response HTTP 201 trả document đã lưu, có `_id`, `status: "pending"` và `
 
 ### PUT — Cập nhật trạng thái
 
-URL: `http://localhost:5000/api/orders/{{orderId}}`
+URL: `{{baseUrl}}/api/orders/{{orderId}}`
 
 ```json
 {
@@ -165,7 +178,7 @@ Response HTTP 200 trả document sau cập nhật. Bản code dùng PUT để b�
 
 ### DELETE — Xóa đơn hàng
 
-URL: `http://localhost:5000/api/orders/{{orderId}}`. Không cần body.
+URL: `{{baseUrl}}/api/orders/{{orderId}}`. Không cần body.
 
 ```json
 {
@@ -208,8 +221,10 @@ Biến collection:
 
 | Biến | Giá trị |
 | --- | --- |
-| baseUrl | `http://localhost:5000` |
+| baseUrl | `https://nguyenngocgiahan-lab2-ltw.onrender.com` để gọi online; `http://localhost:5000` để gọi local |
 | orderId | Tự lưu từ response POST thành công |
+
+Nếu sửa baseUrl trong file JSON ở VS Code, cần lưu và import lại vào Postman; hoặc sửa trực tiếp Variables của collection đang dùng. Giữ các request dạng `{{baseUrl}}/api/orders`; baseUrl không chứa `/api/orders`.
 
 Không bắt buộc tạo Environment riêng. Nếu dùng Postman Web, chọn Desktop Agent để gửi tới localhost.
 
@@ -254,25 +269,52 @@ Trên Atlas, mở **Data Explorer → OrderDB → orders → Documents**. Đối
 | Collection trống sau test | Có thể đã DELETE; POST lại một đơn |
 | Search bị coi là ID | Đặt `/search` trước `/:id` |
 
-## 8. Tiến độ và phần mở rộng
+## 8. Deploy trên Render
 
-| Nội dung Lab 2 | Tình trạng bản code |
+URL dịch vụ: [https://nguyenngocgiahan-lab2-ltw.onrender.com](https://nguyenngocgiahan-lab2-ltw.onrender.com). Postman đã được cấu hình để dùng URL này.
+
+| Cấu hình | Giá trị |
+| --- | --- |
+| Service Type | Web Service |
+| Language | Node |
+| Root Directory | `order-management-api` nếu package.json nằm trong thư mục con này |
+| Build Command | `npm install` |
+| Start Command | `npm start` |
+| MONGO_URI | URI Atlas thật, đặt trong Environment của Render |
+| NODE_ENV | `production` |
+| PORT | Dùng biến môi trường do Render cung cấp |
+
+Nếu package.json nằm ngay gốc repo, để trống Root Directory. Render chạy nhánh Git đã chọn; commit code mới lên nhánh đó để cập nhật dịch vụ nếu Auto Deploy đang bật.
+
+Trong trang dịch vụ Render, lấy các dải IP tại **Connect → Outbound** rồi thêm vào **Atlas → Network Access → IP Access List**. Đây là IP máy chủ Render; cấp quyền cho IP máy cá nhân chỉ phục vụ chạy local.
+
+### Kiểm tra sau deploy
+
+1. Xác nhận Render báo Live, logs cho thấy kết nối database thành công.
+2. Tắt server local bằng Ctrl+C.
+3. Dùng baseUrl online để thử POST, GET, PUT, ba Challenge và DELETE.
+4. Đối chiếu dữ liệu trên Atlas, GET lại ID đã xóa phải trả 404.
+5. Nếu local và online dùng cùng URI/database, cả hai thao tác trên cùng dữ liệu.
+
+Gói Free có thể tạm ngủ khi không có truy cập; request đầu tiên sau thời gian nghỉ có thể chậm. Dự án hiện chưa có đăng nhập/phân quyền, nên dùng dữ liệu mẫu cho API công khai.
+
+## 9. Tiến độ và phần nghiên cứu tiếp
+
+| Nội dung Lab 2 | Trạng thái |
 | --- | --- |
 | Mục III: Khởi tạo, model, kết nối, CRUD | Đã triển khai |
-| Mục IV: Postman | Có collection và hướng dẫn; CRUD đã được kiểm tra trên môi trường cá nhân |
-| Mục VI: 3 Challenge | Đã triển khai; cần kiểm tra với dữ liệu Atlas của người chạy |
-| Mục V: Validation tổng tiền | Chưa triển khai |
-| Mục V: Response chuẩn hóa | Chưa triển khai |
-| Mục V: Logging bằng morgan | Chưa triển khai |
-| Mục VII: Deploy backend | Chưa triển khai |
+| Mục IV: Postman và đối chiếu Atlas | Đã kiểm tra CRUD trên local |
+| Mục VI: Lọc, tìm kiếm, sắp xếp | Đã triển khai, có request và dữ liệu kiểm thử |
+| Mục VII: Render | Đã cấu hình URL online và baseUrl Postman; kiểm tra đầy đủ theo mục 8 |
+| Mục V: Validation tổng tiền | Để nghiên cứu sau |
+| Mục V: Response chuẩn hóa | Để nghiên cứu sau |
+| Mục V: Logging bằng morgan | Để nghiên cứu sau |
 
-Mục V được tài liệu ghi rõ là gợi ý mở rộng. Mục VII có hướng dẫn deploy nhưng tài liệu không nêu rõ đây có phải tiêu chí chấm bắt buộc hay không; cần đối chiếu yêu cầu nộp bài của giảng viên.
+Mục V là phần gợi ý mở rộng trong tài liệu. Bản hiện tại chưa triển khai ba nội dung này và chưa chuẩn hóa response thành `{ success, data, message }`.
 
-Nếu làm tiếp mục V: kiểm tra `totalAmount = tổng(quantity × unitPrice)`; thống nhất response `{ success, data, message }`; thêm middleware morgan. Khi thay cấu trúc response, phải cập nhật script Postman lấy orderId cho khớp.
+Khi làm tiếp: kiểm tra `totalAmount = tổng(quantity × unitPrice)`; thống nhất response; thêm morgan. Nếu bọc document trong `data`, cần sửa script Postman lấy ID thành `pm.response.json().data._id`.
 
-Theo mục VII, có thể triển khai backend lên Render hoặc Railway và đặt `MONGO_URI` cùng cấu hình cổng theo môi trường hosting. Nếu repo chứa backend trong thư mục con, cần đặt thư mục gốc dịch vụ tới nơi có `package.json`. GitHub lưu code; GitHub Pages không chạy server Express. Sau deploy, đổi baseUrl trong Postman thành URL dịch vụ và kiểm tra lại API.
-
-## 9. Đưa code lên GitHub
+## 10. Đưa code lên GitHub
 
 Kiểm tra `git status` trước khi commit. Bảo đảm `.env`, các file credentials và `node_modules/` được bỏ qua. File chứa credentials ở thư mục cha cần được bỏ qua bởi `.gitignore` ở cấp phù hợp.
 
