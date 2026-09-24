@@ -1,0 +1,63 @@
+{
+  "info": {
+    "name": "Lab 2 - Order Management API",
+    "description": "Import collection; run POST first to set orderId, then GET/PUT/DELETE.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Tao don hang (POST)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "if (pm.response.code === 201) pm.collectionVariables.set('orderId', pm.response.json()._id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customerName\": \"Nguyen Ngoc Gia Han\",\n  \"customerEmail\": \"giahan@email.com\",\n  \"items\": [\n    { \"productName\": \"Laptop Dell XPS\", \"quantity\": 1, \"unitPrice\": 25000000 },\n    { \"productName\": \"Chuot Logitech\", \"quantity\": 2, \"unitPrice\": 500000 }\n  ],\n  \"totalAmount\": 26000000\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/orders"
+      }
+    },
+    {
+      "name": "2. Lay danh sach (GET)",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/orders" }
+    },
+    {
+      "name": "3. Lay theo ID (GET)",
+      "request": { "method": "GET", "url": "{{baseUrl}}/api/orders/{{orderId}}" }
+    },
+    {
+      "name": "4. Cap nhat trang thai (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"confirmed\"\n}",
+          "options": { "raw": { "language": "json" } }
+        },
+        "url": "{{baseUrl}}/api/orders/{{orderId}}"
+      }
+    },
+    {
+      "name": "5. Xoa don hang (DELETE)",
+      "request": { "method": "DELETE", "url": "{{baseUrl}}/api/orders/{{orderId}}" }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000" },
+    { "key": "orderId", "value": "" }
+  ]
+}
