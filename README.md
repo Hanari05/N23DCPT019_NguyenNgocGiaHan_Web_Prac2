@@ -1,12 +1,12 @@
-# 🛒 Lab 2 — RESTful API Quản lý Đơn hàng
+# Lab 2 — RESTful API Quản lý Đơn hàng
 
 **Sinh viên:** Nguyễn Ngọc Gia Hân · **MSSV:** N23DCPT019  
-**Học phần:** Lập trình Web
+**Học phần:** Lập trình Web  
 **Nội dung:** Backend với Node.js, Express và MongoDB Atlas
 
 API quản lý đơn hàng phục vụ thực hành CRUD, kết nối cơ sở dữ liệu qua Mongoose và kiểm thử bằng Postman. Dự án có chức năng lọc trạng thái, tìm kiếm tên khách hàng và sắp xếp tổng tiền theo mục Challenge của Lab 2.
 
-## 🌐 API online
+## API online
 
 - **Render:** [https://nguyenngocgiahan-lab2-ltw.onrender.com](https://nguyenngocgiahan-lab2-ltw.onrender.com)
 - **Danh sách đơn hàng:** [https://nguyenngocgiahan-lab2-ltw.onrender.com/api/orders](https://nguyenngocgiahan-lab2-ltw.onrender.com/api/orders)
